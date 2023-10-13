@@ -12,7 +12,7 @@ The app provides lodging recommendations for travelers going to San Francisco. I
 ## Prerequisites
 
 * A Microsoft Azure subscription.
-* An Azure OpenAI Service resource with `gpt-4` and `text-embedding-ada-002` models deployed. For more information about model deployment, see the [resource deployment guide](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/create-resource?pivots=web-portal).
+* An Azure OpenAI Service resource with GPT and Embedding models deployed. For more information about model deployment, see the [resource deployment guide](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/create-resource?pivots=web-portal).
 * The latest [Node.js version](https://github.com/nodejs/release#release-schedule).
 * A YugabyteDB cluster of version [2.19.2 or later](https://download.yugabyte.com/).
 
