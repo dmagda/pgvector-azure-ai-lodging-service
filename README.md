@@ -1,4 +1,4 @@
-# Lodging Recommendation Service With OpenAI and PostgreSQL pgvector extension
+# Lodging Recommendation Service With Azure OpenAI and YugabyteDB
 
 This is a sample Node.JS and React application that demonstrates how to build AI-powered apps using the OpenAI API and PostgreSQL pgvector extension.
 
