@@ -1,5 +1,3 @@
-CREATE EXTENSION IF NOT EXISTS vector;
-
 DROP TABLE IF EXISTS airbnb_listing;
 
 CREATE TABLE airbnb_listing(
@@ -109,7 +107,6 @@ CREATE TABLE airbnb_listing(
     calculated_host_listings_count_private_rooms integer NOT NULL,
     calculated_host_listings_count_shared_rooms integer NOT NULL,
     reviews_per_month DECIMAL(4, 2),
-    description_embedding vector(1536),
     PRIMARY KEY (id)
 );
 

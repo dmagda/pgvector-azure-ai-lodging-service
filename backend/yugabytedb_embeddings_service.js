@@ -1,4 +1,4 @@
-const { OpenAI } = require("openai");
+const { OpenAIClient, AzureKeyCredential } = require("@azure/openai");
 const { Client } = require("pg");
 const { checkEmbeddingValid } = require("./embeddings_utils.js");
 const PropertiesReader = require('properties-reader');
@@ -6,11 +6,13 @@ const PropertiesReader = require('properties-reader');
 const properties = PropertiesReader(__dirname + '/../application.properties.ini');
 
 console.log("Properties file " + __dirname + '/../application.properties.ini');
-class PostgresEmbeddingsService {
+class YugabyteDbEmbeddingsService {
 
-    #openai;
+    #azureOpenAi;
 
-    #pgEndpoint = {
+    #embeddingModel = properties.get('AZURE_EMBEDDING_MODEL_DEPLOYMENT_NAME');
+
+    #dbEndpoint = {
         host: properties.get('DATABASE_HOST'),
         port: properties.get('DATABASE_PORT'),
         database: properties.get('DATABASE_NAME'),
@@ -18,34 +20,31 @@ class PostgresEmbeddingsService {
         password: properties.get('DATABASE_PASSWORD')
     };
 
-    #client;
+    #dbClient;
 
     constructor() { }
 
     async connect() {
-        this.#openai = new OpenAI({ apiKey: properties.get('OPENAI_API_KEY') });
-        this.#client = new Client(this.#pgEndpoint);
+        this.#azureOpenAi = new OpenAIClient(properties.get('AZURE_OPENAI_ENDPOINT'),
+            new AzureKeyCredential(properties.get('AZURE_OPENAI_KEY')));
 
-        await this.#client.connect();
+        this.#dbClient = new Client(this.#dbEndpoint);
 
-        console.log("Connected to Postgres");
+        await this.#dbClient.connect();
+
+        console.log("Connected to YugabyteDB");
     }
 
     async searchPlaces(prompt, matchThreshold, matchCnt) {
         prompt = prompt.replace(/\n/g, ' ');
 
-        const embeddingResp = await this.#openai.embeddings.create(
-            {
-                model: "text-embedding-ada-002",
-                input: prompt
-            }
-        );
+        const embeddingResp = await this.#azureOpenAi.getEmbeddings(this.#embeddingModel, prompt);
 
         if (!checkEmbeddingValid(embeddingResp)) {
             return { "error": "Failed to generate an embedding for the prompt" };
         }
 
-        const res = await this.#client.query(
+        const res = await this.#dbClient.query(
             "SELECT name, description, price, 1 - (description_embedding <=> $1) as similarity " +
             "FROM airbnb_listing WHERE 1 - (description_embedding <=> $1) > $2 ORDER BY similarity DESC LIMIT $3",
             ['[' + embeddingResp.data[0].embedding + ']', matchThreshold, matchCnt]);
@@ -66,4 +65,4 @@ class PostgresEmbeddingsService {
     }
 }
 
-module.exports.PostgresEmbeddingsService = PostgresEmbeddingsService;
+module.exports.YugabyteDbEmbeddingsService = YugabyteDbEmbeddingsService;

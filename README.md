@@ -11,7 +11,10 @@ The app provides recommendations for various lodging options for travelers headi
 
 ## Prerequisites
 
-* CA ChatGPT Plus subscription (required if you've exhausted the initial free credits): https://platform.openai.com
+* A Microsoft Azure subscription.
+* An Azure OpenAI Service resource with `gpt-4` and `text-embedding-ada-002` models deployed. For more information about model deployment, see the [resource deployment guide](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/create-resource?pivots=web-portal).
+* The latest [Node.js version](https://github.com/nodejs/release#release-schedule).
+* A YugabyteDB cluster of version 2.19.2 or later.
 
 ## Start the Database
 
@@ -60,23 +63,6 @@ The pgvector extension is supported by both PostgresSQL and YugabyteDB. Follow t
     DATABASE_PASSWORD=yugabyte
     ```
 
-### PostgreSQL
-
-1. Launch a Postgres instance using the docker image with pgvector:
-    ```shell
-    mkdir ~/postgresql_data/
-
-    docker run --name postgresql \
-        -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=password \
-        -p 5432:5432 \
-        -v ~/postgresql_data/:/var/lib/postgresql/data -d ankane/pgvector:latest
-    ```
-
-2. Run the script to create the Airbnb listings table and activate the pgvector extension:
-    ```shell
-    psql -h 127.0.0.1 -U postgres -d postgres -a -q -f {project_dir}/sql/airbnb_listings.sql
-    ```
-
 ## Loading the Sample Data Set
 
 You can populate the Airbnb listings table with sample data in two ways.
@@ -107,24 +93,6 @@ You can populate the Airbnb listings table with sample data in two ways.
 
     cd {project_dir}/backend
     node embeddings_generator.js
-    ```
-
-**Second Option**: Download the Airbnb data set with pre-generated embeddings and import it into the database:
-
-1. Download the data set (170 MB): https://drive.google.com/file/d/1DV8OMoiTd-7PSo78yN82CP40kLce0gx-/view?usp=sharing
-
-2. Connect to the database with psql:
-    ```shell
-    # For YugabyteDB
-    psql -h 127.0.0.1 -p 5433 -U yugabyte
-
-    # For Postgres 
-    psql -h 127.0.0.1 -U postgres
-    ```
-
-2. Import the data set into the database:
-    ```sql
-    \copy airbnb_listing from '{full_path_to_the_file}/airbnb_listings_with_embeddings.csv' with DELIMITER '^' CSV;
     ```
 
 ## Starting the Application

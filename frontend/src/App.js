@@ -7,8 +7,8 @@ const CurrentPlacesContext = createContext(null);
 const CurrentSearchServiceContext = createContext(null);
 
 const searchServiceOptions = [
-    { value: "openai_chat", label: "OpenAI Chat" },
-    { value: "postgres", label: "Postgres Embeddings" }];
+    { value: "openai_chat", label: "Azure OpenAI Chat" },
+    { value: "embeddings", label: "YugabyteDB Embeddings" }];
 
 export default function App() {
     const [suggestedPlaces, setSuggestedPlaces] = useState([]);
@@ -42,7 +42,7 @@ function PromptForm() {
 
         setLoading(true);
 
-        fetch('/search?engine=' + searchServiceOption.value + '&prompt=' + prompt).
+        fetch('/search?mode=' + searchServiceOption.value + '&prompt=' + prompt).
             then((response) => {
                 if (!response.ok) {
                     throw new Error(response.status + ' ' + response.statusText);
