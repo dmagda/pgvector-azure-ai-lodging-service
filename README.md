@@ -7,7 +7,7 @@ The app provides lodging recommendations for travelers going to San Francisco. I
 ![openai_lodging-2](https://github.com/YugabyteDB-Samples/openai-pgvector-lodging-service/assets/1537233/99d8c571-bf6c-4bab-970c-5df9f6a76080)
 
 * *Azure OpenAI Chat Mode*: In this mode, the Node.js backend leverages one of the Azure GPT models to generate lodging recommendations based on the user's input.
-* *YugabyteDB Embeddings Mode*: Initially, the backend employs an Azure OpenAI Embeddings model to translate the user's prompt to an embedding (a vectorized representation of the text data). Subsequently, the server does a similarity search in YugabyteDB finding Airbnb properties which descriptions are related to the user's prompt. YugabyteDB relies on the PostgreSQL pgvector extension for the similarity search and other generative AI use cases.
+* *YugabyteDB Embeddings Mode*: Initially, the backend employs an Azure OpenAI Embeddings model to convert the user's prompt into an embedding (a vectorized representation of the text data). Subsequently, the server does a similarity search in YugabyteDB finding Airbnb properties which descriptions are related to the user's prompt. YugabyteDB relies on the PostgreSQL pgvector extension for the similarity search and other generative AI use cases.
 
 ## Prerequisites
 
@@ -72,7 +72,7 @@ docker run -d --name yugabytedb_node3 --net custom-network \
     --base_dir=/home/yugabyte/yb_data --daemon=false
 ```
 
-The database connectivity settings are provided in the `{project_dir}/application.properties.ini` file and don't need to be changed if the cluster was starting with the previous command:
+The database connectivity settings are provided in the `{project_dir}/application.properties.ini` file and do not need to be changed if you started the cluster with the command above:
 ```properties
 DATABASE_HOST=localhost
 DATABASE_PORT=5433
@@ -92,13 +92,13 @@ Next, load the sample Airbnb data set for the properties in San Francisco:
     psql -h 127.0.0.1 -p 5433 -U yugabyte
     \copy airbnb_listing from '{project_dir}/sql/sf_airbnb_listings.csv' DELIMITER ',' CSV HEADER;
     ```
-3. Execute the following script to enable the pgvector extension and add a vector column that will be holding embeddings for the Airbnb properties' descriptions:
+3. Execute the following script to enable the pgvector extension and add the `description_embedding` column of the vector type:
     ```shell
     \i {project_dir}/sql/1_airbnb_embeddings.sql
     ```
-## Generate Embeddings for Airbnb Properties Descriptions
+## Generate Embeddings for Airbnb Listing Descriptions
 
-Airbnb properties store a detailed property description (rooms number, amenities, location and other perks) in the `description` column. That information is a perfect fit for the similarity search against user prompts. However, the text data of the `description` column needs to be converted to a vectorized representation first.
+Airbnb properties provide a detailed property description (rooms number, amenities, location and other perks) in the `description` column. That information is a perfect fit for the similarity search against user prompts. However, the text data of the `description` column needs to be transformed into a vectorized representation.
 
 Use the `embeddings_generator.js` tool to generate embeddings for all Arbnb properties descriptions. The tool leverages the Azure OpenAI Embedding model and stores the generated vectors in the `description_embedding` column in the database:
 
