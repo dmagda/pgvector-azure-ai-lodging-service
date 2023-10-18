@@ -117,18 +117,18 @@ Finished generating embeddings for 7551 rows
 
 ## Starting the Application
 
-2. Start the Node.js backend:
+1. Start the Node.js backend:
     ```shell
     cd {project_dir}/backend
     npm start
     ```
-3. Start the React frontend:
+2. Start the React frontend:
     ```shell
     cd {project_dir}/backend
     npm start
     ```
 
-4. Access the application's user interface at:
+3. Access the application's user interface at:
     http://localhost:3000
 
 Enjoy exploring the app and toggling between the two modes: *Azure OpenAI Chat* and *YugabyteDB Embeddings*. The latter is significantly faster.
@@ -139,7 +139,7 @@ Here are some sample prompts to get you started:
 ```
 We're traveling to San Francisco from October 21st through 28th. We need a hotel with parking.
 
-I'm looking for an apartment near the Golden Gate Bridge with a Bay view.
+I'm looking for an apartment near the Golden Gate Bridge with a nice view of the Bay.
 
 I'd like a hotel near Fisherman's Wharf with a Bay view.
 
