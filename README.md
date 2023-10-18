@@ -4,7 +4,7 @@ This is a sample Node.JS and React application that demonstrates how to build ge
 
 The app provides lodging recommendations for travelers going to San Francisco. It supports two distinct modes:
 
-![openai_lodging-2](https://github.com/YugabyteDB-Samples/openai-pgvector-lodging-service/assets/1537233/99d8c571-bf6c-4bab-970c-5df9f6a76080)
+![azure_openao_lodging-2](https://github.com/YugabyteDB-Samples/yugabytedb-azure-openai-lodging-service/assets/1537233/078e88db-d291-48d5-9909-0be7d31ac698)
 
 * *Azure OpenAI Chat Mode*: In this mode, the Node.js backend leverages one of the Azure GPT models to generate lodging recommendations based on the user's input.
 * *YugabyteDB Embeddings Mode*: Initially, the backend employs an Azure OpenAI Embeddings model to convert the user's prompt into an embedding (a vectorized representation of the text data). Subsequently, the server does a similarity search in YugabyteDB finding Airbnb properties which descriptions are related to the user's prompt. YugabyteDB relies on the PostgreSQL pgvector extension for the similarity search and other generative AI use cases.
@@ -133,7 +133,7 @@ Finished generating embeddings for 7551 rows
 
 Enjoy exploring the app and toggling between the two modes: *Azure OpenAI Chat* and *YugabyteDB Embeddings*. The latter is significantly faster.
 
-![app_screenshot](https://github.com/YugabyteDB-Samples/openai-pgvector-lodging-service/assets/1537233/58c573d6-7632-4cf4-96e1-066d3b0c6314)
+![app_screenshot](https://github.com/YugabyteDB-Samples/yugabytedb-azure-openai-lodging-service/assets/1537233/02014aa2-d240-421f-b38c-98f380546a56)
 
 Here are some sample prompts to get you started:
 ```
