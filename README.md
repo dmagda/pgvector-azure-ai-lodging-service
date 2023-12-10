@@ -7,7 +7,7 @@ The app recommends Airbnb listings for travelers going to San Francisco. It supp
 ![azure_openao_lodging-2](https://github.com/dmagda/pgvector-azure-ai-lodging-service/assets/1537233/84b42f55-9554-4b08-b713-ac28e354bd68)
 
 * *Azure OpenAI Chat Mode*: In this mode, the Node.js backend leverages one of the Azure GPT models to generate lodging recommendations based on the user's input.
-* *Postgres Embeddings Mode*: Initially, the backend employs an Azure OpenAI Embeddings model to convert the user's prompt into an embedding (a vectorized representation of the text data). Subsequently, the server uses the pgvector and azure_ai extensions to find the most relevant listings for a provided user prompt.
+* *Postgres Embeddings Mode*: Initially, the backend employs an Azure OpenAI Embeddings model to convert the user's prompt into an embedding (a vectorized representation of the text data). Subsequently, the server uses the [pgvector](https://github.com/pgvector/pgvector) and [azure_ai](https://learn.microsoft.com/en-us/azure/postgresql/flexible-server/generative-ai-azure-overview) extensions to find the most relevant listings for a provided user prompt.
 
 ## Prerequisites
 
