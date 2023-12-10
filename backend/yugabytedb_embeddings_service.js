@@ -1,5 +1,6 @@
 const { OpenAIClient, AzureKeyCredential } = require("@azure/openai");
 const { Client } = require("pg");
+const fs = require('fs');
 const { checkEmbeddingValid } = require("./embeddings_utils.js");
 const PropertiesReader = require('properties-reader');
 
@@ -17,7 +18,10 @@ class YugabyteDbEmbeddingsService {
         port: properties.get('DATABASE_PORT'),
         database: properties.get('DATABASE_NAME'),
         user: properties.get('DATABASE_USER'),
-        password: properties.get('DATABASE_PASSWORD')
+        password: properties.get('DATABASE_PASSWORD'),
+        ssl: {
+            ca: fs.readFileSync(properties.get('DATABASE_CA_CERT_FILE'))
+        }
     };
 
     #dbClient;
@@ -46,7 +50,7 @@ class YugabyteDbEmbeddingsService {
 
         const res = await this.#dbClient.query(
             "SELECT name, description, price, 1 - (description_embedding <=> $1) as similarity " +
-            "FROM airbnb_listing WHERE 1 - (description_embedding <=> $1) > $2 ORDER BY similarity DESC LIMIT $3",
+            "FROM airbnb_listing WHERE 1 - (description_embedding <=> $1) > $2 ORDER BY description_embedding <=> $1 LIMIT $3",
             ['[' + embeddingResp.data[0].embedding + ']', matchThreshold, matchCnt]);
 
         let places = [];

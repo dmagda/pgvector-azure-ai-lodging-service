@@ -1,28 +1,52 @@
-# Lodging Recommendation Service With Azure OpenAI and YugabyteDB
+# Airbnb Recommendation Service Using pgvector and azure_ai
 
-This is a sample Node.JS and React application that demonstrates how to build generative AI applications using the Azure OpenAI Service and YugabyteDB.
+This is a sample Node.JS and React application that demonstrates how to build generative AI applications using the Azure Database for PostgreSQL and its two extensions - pgvector and azure_ai.
 
-The app provides lodging recommendations for travelers going to San Francisco. It supports two distinct modes:
+The app recommends Airbnb listings for travelers going to San Francisco. It supports two distinct modes:
 
 ![azure_openao_lodging-2](https://github.com/YugabyteDB-Samples/yugabytedb-azure-openai-lodging-service/assets/1537233/078e88db-d291-48d5-9909-0be7d31ac698)
 
 * *Azure OpenAI Chat Mode*: In this mode, the Node.js backend leverages one of the Azure GPT models to generate lodging recommendations based on the user's input.
-* *YugabyteDB Embeddings Mode*: Initially, the backend employs an Azure OpenAI Embeddings model to convert the user's prompt into an embedding (a vectorized representation of the text data). Subsequently, the server does a similarity search in YugabyteDB finding Airbnb properties which descriptions are related to the user's prompt. YugabyteDB relies on the PostgreSQL pgvector extension for the similarity search and other generative AI use cases.
+* *Postgres Embeddings Mode*: Initially, the backend employs an Azure OpenAI Embeddings model to convert the user's prompt into an embedding (a vectorized representation of the text data). Subsequently, the server uses the pgvector and azure_ai extensions to find the most relevant listings for a provided user prompt.
 
 ## Prerequisites
 
 * A Microsoft Azure subscription.
-* An Azure OpenAI Service resource with GPT and Embedding models deployed. For more information about model deployment, see the [resource deployment guide](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/create-resource?pivots=web-portal).
 * The latest [Node.js version](https://github.com/nodejs/release#release-schedule).
-* A YugabyteDB cluster of version [2.19.2 or later](https://download.yugabyte.com/).
 
-## Download Application and Provide Azure OpenAI Settings
+## Start Azure Database for PostgreSQL
+
+Set up an instance of the Azure Database for PostgreSQL and enable required extensions:
+
+1. Start a Postgres instance of version 15th or later: https://azure.microsoft.com/en-us/products/postgresql/
+
+2. Once the instance is started, go to the `Networking` tab:
+    TODO picture here
+    * Add your machine's IP address to the IP allow list
+    * Download the SSL certificate that is necessary for secured connections between the application and database.
+
+3. Go to the `Server parameters` tab:
+    TODO picture here
+    * Add the `AZURE_AI` extension to the `azure.extensions` setting.
+    * Add the `VECTOR` extension to the `azure.extensions` setting.
+
+## Start Azure OpenAI Service
+
+Create an instance of the Azure OpenAI Service following this guide:
+https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/create-resource?pivots=web-portal
+
+Deploy an embedding model under the name of `embedding-model` and a gpt model naming it `gpt-model`:
+https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/create-resource?pivots=web-portal#deploy-a-model
+
+TODO picture goes here
+
+## Download and Configure Application
 
 Download the application and provide settings specific to your instance of the Azure OpenAI Service:
 
 1. Clone the repository:
     ```shell
-    git clone https://github.com/YugabyteDB-Samples/yugabytedb-azure-openai-lodging-service
+    git clone https://github.com/dmagda/pgvector-azure-ai-lodging-service
     ```
 2. Initialize the project:
     ```shell
@@ -34,68 +58,46 @@ Download the application and provide settings specific to your instance of the A
     ```
 3. Open the `{project_dir}/application.properties.ini` file and fill in the Azure specific settings:
     ```properties
+    # Azure OpenAI settings
     AZURE_OPENAI_KEY= # The Azure OpenAI API key
     AZURE_OPENAI_ENDPOINT= # An endpoint for the Language APIs
-    AZURE_GPT_MODEL_DEPLOYMENT_NAME = # A deployment name for the GPT model
-    AZURE_EMBEDDING_MODEL_DEPLOYMENT_NAME = # A deployment name for the Embedding model
+    AZURE_GPT_MODEL_DEPLOYMENT_NAME = gpt-model
+    AZURE_EMBEDDING_MODEL_DEPLOYMENT_NAME = embedding-model
+
+    # Azure Database for PostgreSQL settings
+    DATABASE_HOST= # host name
+    DATABASE_PORT=5433
+    DATABASE_NAME=postgres
+    DATABASE_USER= # user name
+    DATABASE_PASSWORD= # password
+    DATABASE_CA_CERT_FILE= # path to the CA certificate file (downloaded lated in this guide)
     ```
 
-Follow [this Azure guide](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/create-resource?pivots=web-portal), if you'd like to know how to deploy Azure models and find their names.
+## Load Airbnb Data Set and Set Up Extensions
 
-## Start YugabyteDB and Load Sample Data Set
-
-Start a YugabyteDB isntance of version 2.19.2 or later:
-```shell
-mkdir ~/yb_docker_data
-
-docker network create custom-network
-
-docker run -d --name yugabytedb_node1 --net custom-network \
-    -p 15433:15433 -p 7001:7000 -p 9001:9000 -p 5433:5433 \
-    -v ~/yb_docker_data/node1:/home/yugabyte/yb_data --restart unless-stopped \
-    yugabytedb/yugabyte:2.19.2.0-b121 \
-    bin/yugabyted start \
-    --base_dir=/home/yugabyte/yb_data --daemon=false
-
-docker run -d --name yugabytedb_node2 --net custom-network \
-    -p 15434:15433 -p 7002:7000 -p 9002:9000 -p 5434:5433 \
-    -v ~/yb_docker_data/node2:/home/yugabyte/yb_data --restart unless-stopped \
-    yugabytedb/yugabyte:2.19.2.0-b121 \
-    bin/yugabyted start --join=yugabytedb_node1 \
-    --base_dir=/home/yugabyte/yb_data --daemon=false
-    
-docker run -d --name yugabytedb_node3 --net custom-network \
-    -p 15435:15433 -p 7003:7000 -p 9003:9000 -p 5435:5433 \
-    -v ~/yb_docker_data/node3:/home/yugabyte/yb_data --restart unless-stopped \
-    yugabytedb/yugabyte:2.19.2.0-b121 \
-    bin/yugabyted start --join=yugabytedb_node1 \
-    --base_dir=/home/yugabyte/yb_data --daemon=false
-```
-
-The database connectivity settings are provided in the `{project_dir}/application.properties.ini` file and do not need to be changed if you started the cluster with the command above:
-```properties
-DATABASE_HOST=localhost
-DATABASE_PORT=5433
-DATABASE_NAME=yugabyte
-DATABASE_USER=yugabyte
-DATABASE_PASSWORD=yugabyte
-```
-
-Next, load the sample Airbnb data set for the properties in San Francisco:
-1. Create the original schema:
+Next, load the sample Airbnb data set for the properties in San Francisco. The schema and data are located in the `{project_dir}/sql` directory of this project:
+1. Connect to the database using psql or another SQL tool:
     ```shell
-    psql -h 127.0.0.1 -p 5433 -U yugabyte -d yugabyte {project_dir}/sql/0_airbnb_listings.sql
+    psql "host={azure-database-host} port=5432 user={azure-database-username} sslrootcert={azure-database-path-to-ca-certificate} sslmode=require"
     ```
-
-2. Load the data:
+2. Create the database schema:
     ```shell
-    psql -h 127.0.0.1 -p 5433 -U yugabyte
+    \i {project_dir}/sql/0_airbnb_listings.sql
+    ```
+3. Load the data:
+    ```shell
     \copy airbnb_listing from '{project_dir}/sql/sf_airbnb_listings.csv' DELIMITER ',' CSV HEADER;
     ```
-3. Execute the following script to enable the pgvector extension and add the `description_embedding` column of the vector type:
+4. Execute the following script to create the pgvector and azure_ai extensions, and to add the `description_embedding` to the table:
     ```shell
     \i {project_dir}/sql/1_airbnb_embeddings.sql
     ```
+5. Provide your Azure OpenAI enpoint and key to the azure_ai extension:
+    ```sql
+    select azure_ai.set_setting('azure_openai.endpoint','{azure-openai-endpoint}');
+    select azure_ai.set_setting('azure_openai.subscription_key','{azure-openai-key}');
+    ```
+
 ## Generate Embeddings for Airbnb Listing Descriptions
 
 Airbnb properties provide a detailed property description (rooms number, amenities, location and other perks) in the `description` column. That information is a perfect fit for the similarity search against user prompts. However, the text data of the `description` column needs to be transformed into a vectorized representation.
