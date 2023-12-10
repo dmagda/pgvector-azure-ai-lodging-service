@@ -1,5 +1,5 @@
 const express = require('express');
-const { YugabyteDbEmbeddingsService } = require('./yugabytedb_embeddings_service.js');
+const { PostgresEmbeddingsService } = require('./postgres_embeddings_service.js');
 const { OpenAIChatService } = require('./openai_chat_service.js');
 const PropertiesReader = require('properties-reader');
 
@@ -7,7 +7,7 @@ const properties = PropertiesReader(__dirname + '/../application.properties.ini'
 
 const PORT = properties.get('EXPRESS_SERVER_PORT');
 
-const postgresService = new YugabyteDbEmbeddingsService();
+const postgresService = new PostgresEmbeddingsService();
 const openaiService = new OpenAIChatService();
 
 const app = express();

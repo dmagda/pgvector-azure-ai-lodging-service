@@ -7,7 +7,7 @@ const PropertiesReader = require('properties-reader');
 const properties = PropertiesReader(__dirname + '/../application.properties.ini');
 
 console.log("Properties file " + __dirname + '/../application.properties.ini');
-class YugabyteDbEmbeddingsService {
+class PostgresEmbeddingsService {
 
     #azureOpenAi;
 
@@ -36,7 +36,7 @@ class YugabyteDbEmbeddingsService {
 
         await this.#dbClient.connect();
 
-        console.log("Connected to YugabyteDB");
+        console.log("Connected to Postgres");
     }
 
     async searchPlaces(prompt, matchThreshold, matchCnt) {
@@ -69,4 +69,4 @@ class YugabyteDbEmbeddingsService {
     }
 }
 
-module.exports.YugabyteDbEmbeddingsService = YugabyteDbEmbeddingsService;
+module.exports.PostgresEmbeddingsService = PostgresEmbeddingsService;

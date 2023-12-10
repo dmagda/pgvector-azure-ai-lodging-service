@@ -8,7 +8,7 @@ const CurrentSearchServiceContext = createContext(null);
 
 const searchServiceOptions = [
     { value: "openai_chat", label: "Azure OpenAI Chat" },
-    { value: "embeddings", label: "YugabyteDB Embeddings" }];
+    { value: "embeddings", label: "Postgres Embeddings" }];
 
 export default function App() {
     const [suggestedPlaces, setSuggestedPlaces] = useState([]);

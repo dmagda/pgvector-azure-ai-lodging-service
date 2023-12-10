@@ -52,11 +52,10 @@ Download the application and provide settings specific to your instance of the A
     ```
 2. Initialize the project:
     ```shell
-    cd {project_dir}/backend
-    npm init 
+    npm i 
 
     cd {project_dir}/frontend
-    npm init 
+    npm i 
     ```
 3. Open the `{project_dir}/application.properties.ini` file and fill in the Azure specific settings:
     ```properties
