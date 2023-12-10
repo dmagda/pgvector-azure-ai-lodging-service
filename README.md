@@ -4,7 +4,7 @@ This is a sample Node.JS and React application that demonstrates how to build ge
 
 The app recommends Airbnb listings for travelers going to San Francisco. It supports two distinct modes:
 
-![azure_openao_lodging-2](https://github.com/YugabyteDB-Samples/yugabytedb-azure-openai-lodging-service/assets/1537233/078e88db-d291-48d5-9909-0be7d31ac698)
+![azure_openao_lodging](https://github.com/dmagda/pgvector-azure-ai-lodging-service/assets/1537233/7e526933-7e1a-42c6-aa3c-81cacfa7f24a)
 
 * *Azure OpenAI Chat Mode*: In this mode, the Node.js backend leverages one of the Azure GPT models to generate lodging recommendations based on the user's input.
 * *Postgres Embeddings Mode*: Initially, the backend employs an Azure OpenAI Embeddings model to convert the user's prompt into an embedding (a vectorized representation of the text data). Subsequently, the server uses the pgvector and azure_ai extensions to find the most relevant listings for a provided user prompt.
