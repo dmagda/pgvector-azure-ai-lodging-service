@@ -21,12 +21,14 @@ Set up an instance of the Azure Database for PostgreSQL and enable required exte
 1. Start a Postgres instance of version 15th or later: https://azure.microsoft.com/en-us/products/postgresql/
 
 2. Once the instance is started, go to the `Networking` tab:
-    TODO picture here
+    ![pg-network](https://github.com/dmagda/pgvector-azure-ai-lodging-service/assets/1537233/68d65f09-bcb2-49b5-aa88-753f835a22e0)
+
     * Add your machine's IP address to the IP allow list
     * Download the SSL certificate that is necessary for secured connections between the application and database.
 
 3. Go to the `Server parameters` tab:
-    TODO picture here
+    ![pg-extensions](https://github.com/dmagda/pgvector-azure-ai-lodging-service/assets/1537233/9f16aa55-b815-4157-af46-8d6b2f438827)
+
     * Add the `AZURE_AI` extension to the `azure.extensions` setting.
     * Add the `VECTOR` extension to the `azure.extensions` setting.
 
@@ -38,7 +40,7 @@ https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/create-resourc
 Deploy an embedding model under the name of `embedding-model` and a gpt model naming it `gpt-model`:
 https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/create-resource?pivots=web-portal#deploy-a-model
 
-TODO picture goes here
+![azure-models](https://github.com/dmagda/pgvector-azure-ai-lodging-service/assets/1537233/193884c1-2af0-42ff-a4c5-f996bce9538d)
 
 ## Download and Configure Application
 
