@@ -136,7 +136,7 @@ Finished generating embeddings for 7551 rows
 
 Enjoy exploring the app and toggling between the two modes: *Azure OpenAI Chat* and *YugabyteDB Embeddings*. The latter is significantly faster.
 
-![app_screenshot](https://github.com/YugabyteDB-Samples/yugabytedb-azure-openai-lodging-service/assets/1537233/02014aa2-d240-421f-b38c-98f380546a56)
+<img width="1489" alt="app-screen" src="https://github.com/dmagda/pgvector-azure-ai-lodging-service/assets/1537233/32984551-7afc-4ab3-88ae-03f337c02c9e">
 
 Here are some sample prompts to get you started:
 ```
