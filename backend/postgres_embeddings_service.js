@@ -1,17 +1,11 @@
-const { OpenAIClient, AzureKeyCredential } = require("@azure/openai");
 const { Client } = require("pg");
 const fs = require('fs');
-const { checkEmbeddingValid } = require("./embeddings_utils.js");
 const PropertiesReader = require('properties-reader');
 
 const properties = PropertiesReader(__dirname + '/../application.properties.ini');
 
 console.log("Properties file " + __dirname + '/../application.properties.ini');
 class PostgresEmbeddingsService {
-
-    #azureOpenAi;
-
-    #embeddingModel = properties.get('AZURE_EMBEDDING_MODEL_DEPLOYMENT_NAME');
 
     #dbEndpoint = {
         host: properties.get('DATABASE_HOST'),
@@ -29,9 +23,6 @@ class PostgresEmbeddingsService {
     constructor() { }
 
     async connect() {
-        this.#azureOpenAi = new OpenAIClient(properties.get('AZURE_OPENAI_ENDPOINT'),
-            new AzureKeyCredential(properties.get('AZURE_OPENAI_KEY')));
-
         this.#dbClient = new Client(this.#dbEndpoint);
 
         await this.#dbClient.connect();
@@ -44,12 +35,12 @@ class PostgresEmbeddingsService {
 
         const res = await this.#dbClient.query(
             "WITH prompt AS (" +
-            "SELECT (SELECT azure_openai.create_embeddings('embedding-model', $1))::vector as embedding" +
+            "SELECT (SELECT azure_openai.create_embeddings($1, $2))::vector as embedding" +
             ")" +
             "SELECT name, description, price, 1 - (description_embedding <=> (select embedding from prompt)) as similarity " +
-            "FROM airbnb_listing WHERE 1 - (description_embedding <=> (select embedding from prompt)) > $2 " +
-            "ORDER BY description_embedding <=> (select embedding from prompt) LIMIT $3",
-            [prompt, matchThreshold, matchCnt]);
+            "FROM airbnb_listing WHERE 1 - (description_embedding <=> (select embedding from prompt)) > $3 " +
+            "ORDER BY description_embedding <=> (select embedding from prompt) LIMIT $4",
+            [properties.get('AZURE_EMBEDDING_MODEL_DEPLOYMENT_NAME'), prompt, matchThreshold, matchCnt]);
 
         let places = [];
 
