@@ -42,16 +42,14 @@ class PostgresEmbeddingsService {
     async searchPlaces(prompt, matchThreshold, matchCnt) {
         prompt = prompt.replace(/\n/g, ' ');
 
-        const embeddingResp = await this.#azureOpenAi.getEmbeddings(this.#embeddingModel, prompt);
-
-        if (!checkEmbeddingValid(embeddingResp)) {
-            return { "error": "Failed to generate an embedding for the prompt" };
-        }
-
         const res = await this.#dbClient.query(
-            "SELECT name, description, price, 1 - (description_embedding <=> $1) as similarity " +
-            "FROM airbnb_listing WHERE 1 - (description_embedding <=> $1) > $2 ORDER BY description_embedding <=> $1 LIMIT $3",
-            ['[' + embeddingResp.data[0].embedding + ']', matchThreshold, matchCnt]);
+            "WITH prompt AS (" +
+            "SELECT (SELECT azure_openai.create_embeddings('embedding-model', $1))::vector as embedding" +
+            ")" +
+            "SELECT name, description, price, 1 - (description_embedding <=> (select embedding from prompt)) as similarity " +
+            "FROM airbnb_listing WHERE 1 - (description_embedding <=> (select embedding from prompt)) > $2 " +
+            "ORDER BY description_embedding <=> (select embedding from prompt) LIMIT $3",
+            [prompt, matchThreshold, matchCnt]);
 
         let places = [];
 
